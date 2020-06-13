@@ -6,7 +6,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
     dependencies = [
@@ -16,14 +15,18 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='AcademyGroup',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False,
+                                        verbose_name='ID')),
                 ('name', models.CharField(max_length=128)),
             ],
         ),
         migrations.CreateModel(
             name='ExamSession',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False,
+                                        verbose_name='ID')),
                 ('start_time', models.DateTimeField()),
                 ('duration', models.DurationField()),
             ],
@@ -31,12 +34,20 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Question',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('stage', models.IntegerField(choices=[(1, 'Stage1'), (2, 'Stage2')])),
-                ('type', models.CharField(choices=[(1, 'Stage1'), (2, 'Stage2')], max_length=128)),
-                ('max_score', models.DecimalField(decimal_places=2, max_digits=4)),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False,
+                                        verbose_name='ID')),
+                ('stage', models.IntegerField(
+                    choices=[(1, 'Stage1'), (2, 'Stage2')])),
+                ('type', models.CharField(choices=[
+                    (1, 'Stage1'), (2, 'Stage2')], max_length=128)),
+                ('max_score',
+                 models.DecimalField(decimal_places=2, max_digits=4)),
                 ('text', models.TextField()),
-                ('options', django.contrib.postgres.fields.ArrayField(base_field=models.CharField(max_length=128), null=True, size=None)),
+                ('options',
+                 django.contrib.postgres.fields.ArrayField(
+                     base_field=models.CharField(max_length=128), null=True,
+                     size=None)),
             ],
         ),
         migrations.CreateModel(
@@ -44,7 +55,10 @@ class Migration(migrations.Migration):
             fields=[
                 ('token', models.UUIDField(primary_key=True, serialize=False)),
                 ('name', models.CharField(max_length=128)),
-                ('group', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='students', to='exam_web.AcademyGroup')),
+                ('group', models.ForeignKey(
+                    on_delete=django.db.models.deletion.DO_NOTHING,
+                    related_name='students',
+                    to='exam_web.AcademyGroup')),
             ],
         ),
         migrations.CreateModel(
@@ -54,8 +68,15 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('started_at', models.DateTimeField(null=True)),
                 ('finished_at', models.DateTimeField(null=True)),
-                ('exam_session', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='user_sessions', to='exam_web.ExamSession')),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='exam_sheet', to='exam_web.Student')),
+                ('exam_session',
+                 models.ForeignKey(
+                     on_delete=django.db.models.deletion.DO_NOTHING,
+                     related_name='user_sessions',
+                     to='exam_web.ExamSession')),
+                ('student', models.ForeignKey(
+                    on_delete=django.db.models.deletion.DO_NOTHING,
+                    related_name='exam_sheet',
+                    to='exam_web.Student')),
             ],
             options={
                 'unique_together': {('id', 'student', 'exam_session')},
@@ -64,13 +85,25 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='ExamList',
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('id', models.AutoField(auto_created=True,
+                                        primary_key=True, serialize=False,
+                                        verbose_name='ID')),
                 ('answer', models.TextField(null=True)),
                 ('answered_at', models.DateTimeField(null=True)),
-                ('score', models.DecimalField(decimal_places=2, max_digits=4, null=True)),
-                ('question', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='exam_web.Question')),
-                ('session', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='exam_list', to='exam_web.UserSession')),
-                ('student', models.ForeignKey(on_delete=django.db.models.deletion.DO_NOTHING, related_name='exam_questions', to='exam_web.Student')),
+                ('score', models.DecimalField(
+                    decimal_places=2, max_digits=4, null=True)),
+                ('question', models.ForeignKey(
+                    on_delete=django.db.models.deletion.CASCADE,
+                    to='exam_web.Question')),
+                ('session', models.ForeignKey(
+                    on_delete=django.db.models.deletion.DO_NOTHING,
+                    related_name='exam_list',
+                    to='exam_web.UserSession')),
+                ('student',
+                 models.ForeignKey(
+                     on_delete=django.db.models.deletion.DO_NOTHING,
+                     related_name='exam_questions',
+                     to='exam_web.Student')),
             ],
             options={
                 'unique_together': {('student', 'session', 'question')},
