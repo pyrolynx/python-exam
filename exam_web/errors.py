@@ -26,3 +26,8 @@ class EntityNotFound(APIError):
 
     status = 404
     message = '%s not found'
+
+
+class ExamNotAvailable(APIError):
+    status = 403
+    message = 'submission forbidden if exam already submitted or not available'

@@ -1,11 +1,21 @@
+from typing import Union, List
+
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.utils import timezone
 
 CHAR_FIELD_SIZE = 128
 
-QuestionType = models.TextChoices('QuestionType', ['singe', 'multi', 'open'])
-Stage = models.IntegerChoices('Stage', ['stage1', 'stage2'])
+
+class QuestionType(models.TextChoices):
+    single = 'single'
+    multi = 'multi'
+    open = 'open'
+
+
+class Stage(models.IntegerChoices):
+    first = 1
+    second = 2
 
 
 class ExamStatus(models.TextChoices):
@@ -75,13 +85,34 @@ class UserSession(models.Model):
         return ExamStatus.available
 
 
-class ExamList(models.Model):
+class ExamTicket(models.Model):
     student = models.ForeignKey(Student, on_delete=models.DO_NOTHING, related_name='exam_questions')
     session = models.ForeignKey(UserSession, on_delete=models.DO_NOTHING, related_name='exam_list')
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     answer = models.TextField(null=True)
     answered_at = models.DateTimeField(null=True)
     score = models.DecimalField(null=True, decimal_places=2, max_digits=4)
+
+    def submit(self, answer: Union[str, int, List[int]]):
+        if self.question.type == QuestionType.single:
+            assert self.question.options, f'empty options on question'
+            # указан порядковый номер
+            assert isinstance(answer, int), f'answer must be option index with type int (got {answer})'
+            assert answer < len(self.question.options), 'answer index out of option range'
+            self.answer = self.question.options[answer]
+        elif self.question.type == QuestionType.multi:
+            # указаны несколько порядковых номеров
+            assert self.question.options, f'empty options on question'
+            assert isinstance(answer, list) and all(isinstance(x, int) for x in answer), \
+                f'answer must be list of option indices index with type List[int] (got {answer})'
+            assert all(x < len(self.question.options) for x in answer), 'answer index out of option range'
+            self.answer = ';'.join(self.question.options[x] for x in answer)
+        elif self.question.type == QuestionType.open:
+            assert isinstance(answer, str), f'answer must be option index with type str (got {answer})'
+            self.answer = answer
+        else:
+            raise RuntimeError('invalid quetion type')
+        self.save()
 
     class Meta:
         unique_together = ('student', 'session', 'question')
