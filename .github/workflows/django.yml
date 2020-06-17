@@ -35,13 +35,12 @@ jobs:
       run: |
         cp default.env .env
         make pip_deps
-        pip install coverage
         make django_prepare
     - name: Run Tests
       run: |
         python manage.py test
-    - name: Python Django Coverage GitHub Action
-      uses: dc740/django-coveragepy-github-action@0.9
-      with:
-        # Application
-        django-app: 'exam_web'# optional, default is
+    - name: Coverage checl
+      run: |
+        pip install coverage
+        coverage run --source 'exam_web/' manage.py test
+        coverage report
