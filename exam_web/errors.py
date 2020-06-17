@@ -12,7 +12,7 @@ class InvalidParameter(APIError):
     message = 'invalid parameter `%s`'
 
     def __init__(self, param: str):
-        self.message = param % param
+        self.message = self.message % param
 
 
 class Unauthorized(APIError):
@@ -21,11 +21,20 @@ class Unauthorized(APIError):
 
 
 class EntityNotFound(APIError):
-    def __init__(self, name: str = 'entity'):
-        self.message = self.message % name
+    def __init__(self, name: str = None):
+        self.message = self.message % (name or self.name)
 
     status = 404
     message = '%s not found'
+    name = 'entity'
+
+
+class StudentNotFound(EntityNotFound):
+    name = 'student'
+
+
+class ExamNotFound(EntityNotFound):
+    name = 'exam'
 
 
 class ExamNotAvailable(APIError):

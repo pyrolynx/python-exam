@@ -9,18 +9,14 @@ https://docs.djangoproject.com/en/3.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.0/ref/settings/
 """
-
 import ast
+import os
+
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 
-import logging.config
-
-import os
-
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
@@ -33,7 +29,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -43,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'exam_web.apps.ExamWebConfig'
+    'exam_web.apps.ExamWebConfig',
+    'django_better_admin_arrayfield',
 ]
 
 MIDDLEWARE = [
@@ -54,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'exam_web.middleware.JsonResponseMiddleware',
 ]
 
 ROOT_URLCONF = 'python_exam.urls'
@@ -76,7 +73,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'python_exam.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
@@ -87,25 +83,15 @@ DB_PASSWORD = 'exam'
 DB_HOST = '0.0.0.0'
 DB_PORT = 5432
 
-
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
 
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': f'django.contrib.auth.password_validation.{name}'}
+    for name in (
+        'UserAttributeSimilarityValidator', 'MinimumLengthValidator',
+        'CommonPasswordValidator', 'NumericPasswordValidator')
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/3.0/topics/i18n/
@@ -120,11 +106,11 @@ USE_L10N = True
 
 USE_TZ = True
 
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = 'static/'
 
 SENTRY_URL = None
 
@@ -133,9 +119,8 @@ for key in list(locals()):
     if value is not None:
         try:
             locals()[key] = ast.literal_eval(value)
-        except:
+        except Exception:
             locals()[key] = value
-
 
 # if SITE_DOMAIN:
 #     ALLOWED_HOSTS.append(SITE_DOMAIN)
@@ -148,13 +133,13 @@ DATABASES = {
         'ENGINE': DB_ENGINE,
         'NAME': DB_NAME,
         **({
-               'HOST': DB_HOST,
-               'PORT': DB_PORT,
-               'USER': DB_USER,
-               'PASSWORD': DB_PASSWORD,
-           }
-           if DB_ENGINE == 'django.db.backends.postgresql' else {})
-    }
+            'HOST': DB_HOST,
+            'PORT': DB_PORT,
+            'USER': DB_USER,
+            'PASSWORD': DB_PASSWORD,
+        }
+            if DB_ENGINE == 'django.db.backends.postgresql' else {}),
+    },
 }
 
 if SENTRY_URL:
@@ -164,7 +149,7 @@ if SENTRY_URL:
 
         # If you wish to associate users to errors (assuming you are using
         # django.contrib.auth) you may enable sending PII data.
-        send_default_pii=True
+        send_default_pii=True,
     )
 #
 # logging.config.dictConfig(LOG_CONFIG)

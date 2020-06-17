@@ -13,8 +13,11 @@ log = logging.getLogger('middleware')
 class JsonResponseMiddleware(MiddlewareMixin):
     @staticmethod
     def process_request(request: HttpRequest):
+        if not request.path.startswith('/api'):
+            return
         query_params = dict(request.GET)
-        if request.method == 'POST' and request.content_type == 'application/json':
+        if request.method == 'POST' and \
+                request.content_type == 'application/json':
             try:
                 query_params.update(json.loads(request.body))
             except (json.JSONDecodeError, UnicodeDecodeError):
@@ -27,22 +30,23 @@ class JsonResponseMiddleware(MiddlewareMixin):
             return response
 
         response = JsonResponse({'result': response})
-        if 'student' in request.COOKIES and 'student' in request.session:
-            response.set_cookie('student', request.COOKIES['student'])
+        if 'student' in request.session and 'student' not in request.COOKIES:
+            response.set_cookie('student', request.session['student'])
         return response
 
     @staticmethod
     def process_exception(request: HttpRequest, exception):
-        response_body, status = {'status': 'error', 'message': APIError.message}, 500
+        response_body, status = {'error': APIError.message}, 500
         if isinstance(exception, AssertionError):
             exception = InvalidParameter(str(exception))
 
         if isinstance(exception, EmptyResponse):
-            return JsonResponse({'status': 'ok', 'result': None})
+            return JsonResponse({'result': None})
         elif isinstance(exception, APIError):
-            response_body['message'], status = exception.message, exception.status
+            response_body['error'], status = \
+                exception.message, exception.status
         else:
             log.exception('exception')
-            response_body['message'] = f'{type(exception)}: {exception}'
+            response_body['error'] = f'{type(exception)}: {exception}'
 
         return JsonResponse(response_body, status=status)
