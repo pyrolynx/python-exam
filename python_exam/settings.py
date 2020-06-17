@@ -50,6 +50,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'exam_web.middleware.JsonResponseMiddleware',
 ]
 
 ROOT_URLCONF = 'python_exam.urls'

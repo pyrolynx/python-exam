@@ -1,14 +1,8 @@
 from django.contrib import admin
 from django_better_admin_arrayfield.admin.mixins import DynamicArrayMixin
 
-from exam_web.models import AcademyGroup
-from exam_web.models import ExamSession
-from exam_web.models import ExamTicket
-from exam_web.models import Question
-from exam_web.models import Student
-
-
-# Register your models here.
+from exam_web.models import AcademyGroup, UserSession, ExamSession, \
+    ExamTicket, Question, Student
 
 
 @admin.register(AcademyGroup)
@@ -18,7 +12,7 @@ class AcademyGroupAdmin(admin.ModelAdmin):
 
 @admin.register(Student)
 class StudentAdmin(admin.ModelAdmin):
-    readonly_fields = ('token',)
+    pass
 
 
 @admin.register(Question)
@@ -33,4 +27,9 @@ class ExamTicketAdmin(admin.ModelAdmin):
 
 @admin.register(ExamSession)
 class ExamSessionAdmin(admin.ModelAdmin):
+    pass
+
+
+@admin.register(UserSession)
+class UserSessionAdmin(admin.ModelAdmin):
     pass
