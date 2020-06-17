@@ -26,15 +26,16 @@ jobs:
       with:
         # Version of PostgreSQL to use
         postgresql version: 11 # optional, default is latest
-        postgresql db: postgres # optional, default is 
+        postgresql db: exam # optional, default is
         # POSTGRES_USER - create the specified user with superuser power
-        postgresql user: postgres # optional, default is 
+        postgresql user: exam # optional, default is
         # POSTGRES_PASSWORD - superuser password
-        postgresql password: postgres # optional, default is 
+        postgresql password: exam # optional, default is
     - name: Make dev environment
       run: |
         cp default.env .env
-        make dev
+        make pip_deps
+        make django_prepare
     - name: Run Tests
       run: |
         python manage.py test
@@ -42,4 +43,4 @@ jobs:
       uses: dc740/django-coveragepy-github-action@0.9
       with:
         # Application
-        django-app: 'exam_web'# optional, default is 
+        django-app: 'exam_web'# optional, default is
