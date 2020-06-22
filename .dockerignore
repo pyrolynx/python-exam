@@ -1,0 +1,8 @@
+.git/
+.github/
+venv/
+.coverage
+__pycache__
+.env
+.pre-commit-config.yml
+docker-compose.yml

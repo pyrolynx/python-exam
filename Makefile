@@ -15,5 +15,9 @@ django_prepare:
 	DJANGO_SUPERUSER_PASSWORD=${ADMIN_PASSWORD} ./manage.py createsuperuser --no-input --username ${ADMIN_USER} \
 		--email ${ADMIN_EMAIL}
 
+docker:
+	docker build -t pyrolynx/python-exam:latest .
+	docker push pyrolynx/python-exam:latest
+
 
 dev: db_init pip_deps django_prepare
