@@ -98,7 +98,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Yekaterinburg'
 
 USE_I18N = True
 
@@ -113,6 +113,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = 'static/'
 
 SENTRY_URL = None
+SITE_DOMAIN = None
 
 for key in list(locals()):
     value = os.environ.get(key)
@@ -122,9 +123,8 @@ for key in list(locals()):
         except Exception:
             locals()[key] = value
 
-# if SITE_DOMAIN:
-#     ALLOWED_HOSTS.append(SITE_DOMAIN)
-#     BASE_URL = f'https://{SITE_DOMAIN}/'
+if SITE_DOMAIN:
+    ALLOWED_HOSTS.append(SITE_DOMAIN)
 
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
